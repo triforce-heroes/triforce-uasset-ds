@@ -1,0 +1,42 @@
+{
+  "name": "@triforce-heroes/triforce-uasset-ds",
+  "description": "Extract and rebuild .uasset for Demon Slayer II.",
+  "version": "1.0.0",
+  "license": "Apache License 2.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./Extract": "./dist/Extract.js",
+    "./Rebuild": "./dist/Rebuild.js"
+  },
+  "scripts": {
+    "build": "rimraf ./dist && tspc -p ./tsconfig.build.json && swc ./dist -d .",
+    "watch": "tsx --watch ./tools/watch.ts",
+    "prettier": "prettier --check ./src",
+    "prettier:fix": "prettier --write ./src",
+    "eslint": "eslint ./src",
+    "eslint:fix": "eslint --fix ./src",
+    "watch:extract": "tsx watch ./src/watch-extract.ts",
+    "watch:rebuild": "tsx watch ./src/watch-rebuild.ts",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@rheactor/eslint-config-rheactor": "github:rheactor/eslint-config-rheactor",
+    "@swc/cli": "^0.7.8",
+    "@swc/core": "^1.13.5",
+    "@triforce-heroes/triforce-core": "github:triforce-heroes/triforce-core",
+    "@triforce-heroes/triforce-publisher": "github:triforce-heroes/triforce-publisher",
+    "@types/node": "^24.5.2",
+    "esbuild": "^0.25.10",
+    "eslint": "^9.36.0",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "ts-patch": "^3.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "typescript-transform-paths": "^3.5.5",
+    "vitest": "^3.2.4"
+  }
+}
