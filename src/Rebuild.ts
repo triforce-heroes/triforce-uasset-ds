@@ -1,8 +1,7 @@
-import { isAscii } from "node:buffer";
-
 import { BufferBuilder } from "@triforce-heroes/triforce-core/BufferBuilder";
 
 import { extract } from "@/Extract";
+import { isAscii } from "@/services/BufferService";
 
 export function rebuild(
   source: Buffer,
