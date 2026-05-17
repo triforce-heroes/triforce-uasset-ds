@@ -27,9 +27,7 @@ function readAttribute(consumer: BufferConsumer) {
       return consumer.back(2).read(2 + 1 + 12);
     }
 
-    throw new Error(
-      `Unknown attribute type: ${attributeType}:${attributeTypeSub}`,
-    );
+    throw new Error(`Unknown attribute type: ${attributeType}:${attributeTypeSub}`);
   } else {
     throw new Error(`Unknown attribute type: ${attributeType}`);
   }
@@ -59,10 +57,7 @@ export function extract(data: Buffer) {
     );
   }
 
-  const messagesConsumer = new BufferConsumer(
-    data,
-    data.readUInt32LE(4) + 0x0a,
-  );
+  const messagesConsumer = new BufferConsumer(data, data.readUInt32LE(4) + 0x0a);
   const messagesCount = messagesConsumer.readUnsignedInt32();
 
   const entries = new Map<string, Entry>();

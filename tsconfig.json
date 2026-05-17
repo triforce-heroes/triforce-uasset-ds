@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "baseUrl": ".",
     "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -16,11 +15,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
+    "types": ["node"],
 
-    "paths": { "@/*": ["src/*"] },
-    "plugins": [
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
-    ]
+    "paths": { "@/*": ["./src/*"] },
+    "plugins": [{ "transform": "typescript-transform-paths", "afterDeclarations": true }]
   },
 
   "include": ["**/*.ts"],

@@ -18,9 +18,7 @@ export function rebuild(
   builder.writeUnsignedInt32(() => messagesBuilder.length);
   builder.push(source.subarray(sourceSizeOffset + 0x04, sourceMessagesOffset));
 
-  messagesBuilder.push(
-    source.subarray(sourceMessagesOffset, sourceMessagesOffset + 0x0e),
-  );
+  messagesBuilder.push(source.subarray(sourceMessagesOffset, sourceMessagesOffset + 0x0e));
 
   const entries = extract(source);
 
