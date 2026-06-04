@@ -12,7 +12,7 @@ export function rebuild(
   const messagesBuilder = new BufferBuilder();
 
   const sourceMessagesOffset = source.readUInt32LE(0x04);
-  const sourceSizeOffset = source.readUInt32LE(0x020) + 0x08;
+  const sourceSizeOffset = source.readUInt32LE(0x0_20) + 0x08;
 
   builder.push(source.subarray(0, sourceSizeOffset));
   builder.writeUnsignedInt32(() => messagesBuilder.length);
@@ -38,8 +38,7 @@ export function rebuild(
     }
   }
 
-  builder.push(messagesBuilder.build());
-  builder.push(source.subarray(-4));
+  builder.push(messagesBuilder.build(), source.subarray(-4));
 
   if (containerSize !== undefined) {
     builder.pad(containerSize);

@@ -1,4 +1,6 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
+import { join } from "node:path";
 
 import { chunk } from "@triforce-heroes/triforce-core/Array";
 import { generateQuery } from "@triforce-heroes/triforce-publisher";
@@ -49,10 +51,12 @@ const processedEntries = [...entries.entries()].map(([reference, entry]) => ({
   ),
 }));
 
-writeFileSync("entries.json", JSON.stringify(processedEntries, null, "\t"));
+const outDir = "tools";
+
+writeFileSync(join(outDir, "entries.json"), JSON.stringify(processedEntries, null, "\t"));
 
 writeFileSync(
-  "letters.json",
+  join(outDir, "letters.json"),
   JSON.stringify(
     [...letters].toSorted((letterA, letterB) => letterA - letterB),
     null,
@@ -61,7 +65,7 @@ writeFileSync(
 );
 
 writeFileSync(
-  "uniques.json",
+  join(outDir, "uniques.json"),
   JSON.stringify(
     [...new Set([...entries.values()].flatMap((entry) => [...entry.keys()]))],
     null,
@@ -69,11 +73,74 @@ writeFileSync(
   ),
 );
 
-const chunkEntries = chunk(processedEntries, 100);
-const chunkDate = Date.now();
+function hashEntry(entry: (typeof processedEntries)[number]): string {
+  return createHash("sha256").update(JSON.stringify(entry)).digest("hex");
+}
 
-writeFileSync(
-  "query.sql",
+const currentHashes: Record<string, string> = {};
 
-  chunkEntries.map((partialEntries) => generateQuery(3, partialEntries, chunkDate)!).join(";\n\n"),
-);
+for (const entry of processedEntries) {
+  currentHashes[entry.reference] = hashEntry(entry);
+}
+
+let latestVersion = 0;
+
+if (existsSync(outDir)) {
+  const versionPattern = /^query_v(?<version>\d+)\.json$/;
+
+  for (const file of readdirSync(outDir)) {
+    const match = versionPattern.exec(file);
+    const version = match?.groups?.["version"];
+
+    if (version !== undefined && version !== "") {
+      const versionNumber = Number.parseInt(version, 10);
+
+      if (versionNumber > latestVersion) {
+        latestVersion = versionNumber;
+      }
+    }
+  }
+}
+
+let needsNewVersion = true;
+let previousHashes: Record<string, string> | null = null;
+
+if (latestVersion > 0) {
+  previousHashes = JSON.parse(
+    readFileSync(join(outDir, `query_v${latestVersion}.json`), "utf8"),
+  ) as Record<string, string>;
+
+  if (
+    Object.keys(previousHashes).length === Object.keys(currentHashes).length &&
+    Object.entries(currentHashes).every(([ref, hash]) => previousHashes![ref] === hash)
+  ) {
+    needsNewVersion = false;
+  }
+}
+
+if (needsNewVersion) {
+  const newVersion = latestVersion + 1;
+
+  let diffEntries = processedEntries;
+
+  if (previousHashes) {
+    diffEntries = processedEntries.filter(
+      (entry) => previousHashes[entry.reference] !== currentHashes[entry.reference],
+    );
+  }
+
+  const chunkEntries = chunk(diffEntries, 100);
+  const chunkDate = Date.now();
+
+  writeFileSync(
+    join(outDir, `query_v${newVersion}.json`),
+    JSON.stringify(currentHashes, null, "\t"),
+  );
+
+  writeFileSync(
+    join(outDir, `query_v${newVersion}.sql`),
+    chunkEntries
+      .map((partialEntries) => generateQuery(3, partialEntries, chunkDate)!)
+      .join(";\n\n"),
+  );
+}

@@ -12,11 +12,11 @@ const HEADER_LENGTH = 0x44;
 function readAttribute(consumer: BufferConsumer) {
   const attributeType = consumer.readUnsignedInt16();
 
-  if (attributeType === 0x0900) {
+  if (attributeType === 0x09_00) {
     return consumer.back(2).read(2 + 16);
   }
 
-  if (attributeType === 0x0980) {
+  if (attributeType === 0x09_80) {
     const attributeTypeSub = consumer.at();
 
     if (attributeTypeSub === 4) {

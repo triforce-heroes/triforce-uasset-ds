@@ -15,8 +15,6 @@ describe("service Rebuild", () => {
     const source = readFileSync(`${path}/${file}`);
     const sourceRebuilded = rebuild(source, new Map());
 
-    expect(sourceRebuilded.toString("hex")).toStrictEqual(
-      source.toString("hex"),
-    );
+    expect(sourceRebuilded.toString("hex")).toStrictEqual(source.toString("hex"));
   });
 });
