@@ -4,6 +4,7 @@ import { join } from "node:path";
 
 import { chunk } from "@triforce-heroes/triforce-core/Array";
 import { generateQuery } from "@triforce-heroes/triforce-publisher";
+import { regex } from "arkregex";
 
 import { extract } from "@/Extract";
 
@@ -86,13 +87,11 @@ for (const entry of processedEntries) {
 let latestVersion = 0;
 
 if (existsSync(outDir)) {
-  const versionPattern = /^query_v(?<version>\d+)\.json$/;
-
   for (const file of readdirSync(outDir)) {
-    const match = versionPattern.exec(file);
-    const version = match?.groups?.["version"];
+    const match = regex("^query_v(?<version>\\d+)\\.json$").exec(file);
+    const version = match?.groups.version;
 
-    if (version !== undefined && version !== "") {
+    if (version !== undefined) {
       const versionNumber = Number.parseInt(version, 10);
 
       if (versionNumber > latestVersion) {
